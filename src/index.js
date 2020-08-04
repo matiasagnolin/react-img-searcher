@@ -1,17 +1,30 @@
 import React from 'react';
+import SearchBar from './SearchBox';
+import unsplash from './api/unsplash';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import ImageList from './ImageList';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+class App extends React.Component{
+
+    state = { images: [] };
+
+    onSearchSubmit = async term => {
+      const response = await unsplash.get('/search/photos', {
+        params: { query: term }
+      });
+  
+      this.setState({ images: response.data.results });
+    };
+  
+    render() {
+      return (
+        <div className="ui container" style={{ marginTop: '10px' }}>
+          <SearchBar onSubmit={this.onSearchSubmit} />
+          <ImageList images={this.state.images} />
+        </div>
+      );
+    }
+}
+
+ReactDOM.render(<App/>,document.querySelector("#root"));
